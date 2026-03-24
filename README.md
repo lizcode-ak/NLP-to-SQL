@@ -6,11 +6,14 @@ A fullstack web application that converts natural language queries to SQL and ex
 
 - **Natural Language to SQL**: Convert plain English questions to SQL queries using local LLM (Ollama)
 - **File Upload**: Upload CSV or Excel files to automatically create database tables
+- **First Upload UX Fixed**: The `+` upload button works even before selecting a table
 - **Chat Interface**: ChatGPT-like UI for intuitive interaction
 - **Query Display**: See the generated SQL query for every request
 - **Results Visualization**: View query results in formatted tables
 - **Multi-Session Support**: Manage multiple chat sessions with different datasets
 - **Local Execution**: Runs entirely on your machine - no cloud dependencies
+- **Robust CSV Import**: Column headers are sanitized and safely quoted for MySQL (handles spaces/symbols/reserved words)
+- **Improved Ollama Reliability**: Retry with `mistral:latest`, improved timeout, and clearer API error messages
 
 ## 🛠️ Tech Stack
 
@@ -25,7 +28,7 @@ A fullstack web application that converts natural language queries to SQL and ex
 Before you begin, ensure you have installed:
 
 1. **Node.js** (v14 or higher): https://nodejs.org/
-2. **Python** (v3.8 or higher): https://www.python.org/
+2. **Python** (3.11 recommended): https://www.python.org/
 3. **MySQL Server**: https://dev.mysql.com/downloads/mysql/
 4. **Ollama**: https://ollama.ai/ (for local LLM support)
 
@@ -54,22 +57,22 @@ Before you begin, ensure you have installed:
 
 3. Edit `.env` with your MySQL credentials:
    ```
-   MYSQL_HOST=localhost
-   MYSQL_USER=root
-   MYSQL_PASSWORD=your_mysql_password
+   MYSQL_HOST=127.0.0.1
+   MYSQL_USER=chatbot_user
+   MYSQL_PASSWORD=your_new_password
    MYSQL_PORT=3306
    OLLAMA_URL=http://localhost:11434
    OLLAMA_MODEL=mistral
    ```
 
-4. Install Python dependencies:
+4. Install Python dependencies using your project virtual environment:
    ```bash
-   pip install -r requirements.txt
+   & "C:\Users\User\OneDrive\Documents\Chatbot\.venv\Scripts\python.exe" -m pip install -r requirements.txt
    ```
 
 5. Start the Flask backend:
    ```bash
-   python app.py
+   & "C:\Users\User\OneDrive\Documents\Chatbot\.venv\Scripts\python.exe" app.py
    ```
    The backend will run on `http://localhost:5000`
 
@@ -167,12 +170,20 @@ Before you begin, ensure you have installed:
 # Make sure MySQL is running:
 mysql -u root -p
 
-# Check Flask version:
-pip show Flask
+# Make sure dependencies are installed into the project venv:
+& "C:\Users\User\OneDrive\Documents\Chatbot\.venv\Scripts\python.exe" -m pip install -r requirements.txt
+
+# Start backend from backend folder:
+& "C:\Users\User\OneDrive\Documents\Chatbot\.venv\Scripts\python.exe" app.py
 
 # Clear Python cache:
 del /s __pycache__
 ```
+
+### **MySQL access denied (`1045`)**
+- Verify `MYSQL_USER` and `MYSQL_PASSWORD` in `.env`
+- Prefer `MYSQL_HOST=127.0.0.1` on Windows
+- Use a dedicated MySQL user (for example `chatbot_user`) with proper privileges
 
 ### **Frontend can't connect to backend**
 - Ensure backend is running on port 5000
@@ -189,9 +200,15 @@ ollama serve
 ```
 
 ### **CSV/Excel upload fails**
-- Ensure column names don't have special characters
 - File should be less than 16MB
 - Supported formats: .csv, .xlsx, .xls
+- If upload still fails, check backend console for the exact MySQL error
+
+### **Ollama API error 500**
+- Confirm model is installed: `ollama pull mistral`
+- Confirm Ollama responds: `http://127.0.0.1:11434/api/tags`
+- Restart backend after changing model/env settings
+- Recent backend updates already include fallback from `mistral` to `mistral:latest`
 
 ### **No results from queries**
 - Check if the correct table is selected
@@ -206,10 +223,12 @@ ollama serve
    ollama serve
    
    # Terminal 2: Backend
-   cd backend && python app.py
+   cd backend
+   & "C:\Users\User\OneDrive\Documents\Chatbot\.venv\Scripts\python.exe" app.py
    
    # Terminal 3: Frontend
-   cd frontend && npm start
+   cd frontend
+   npm start
    ```
 
 2. **Load Data**:
