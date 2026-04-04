@@ -21,7 +21,7 @@ A fullstack web application that converts natural language queries to SQL and ex
 - **Backend**: Python Flask, MySQL Connector
 - **Database**: MySQL Server (local)
 - **LLM**: Ollama (local LLM inference engine)
-- **NLP**: Local language models via Ollama
+- **NLP**: Local language models with Ollama
 
 ## 📋 Prerequisites
 
