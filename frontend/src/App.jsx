@@ -3,6 +3,7 @@ import axios from 'axios';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import Sidebar from './components/Sidebar';
+
 import './App.css';
 
 const API_URL = 'http://localhost:5000/api';
@@ -81,8 +82,28 @@ function App() {
 
       if (response.data.success) {
         const tableName = response.data.table_name;
+        const summaryData = response.data.summary_data;
+        
         setTables(prev => [...prev, tableName]);
         setSelectedTable(tableName);
+        
+        // Add summary to chat
+        const summaryMessage = {
+          role: 'assistant',
+          content: summaryData,
+          timestamp: new Date().toISOString(),
+          type: 'summary'
+        };
+        setMessages(prev => [...prev, summaryMessage]);
+        
+        // Automatically read out the summary for accessibility
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel(); // Stop any ongoing speech
+          const cleanSummary = summaryData.summary.replace(/[#*`_]/g, ''); // Remove common markdown characters
+          const utterance = new SpeechSynthesisUtterance(cleanSummary);
+          window.speechSynthesis.speak(utterance);
+        }
+        
         setSuccess(`File uploaded successfully! Created table: ${tableName}`);
         setTimeout(() => setSuccess(null), 3000);
       }
@@ -123,6 +144,9 @@ function App() {
             data: response.data.data,
             columns: response.data.columns,
             rows: response.data.rows,
+            explanation: response.data.explanation,
+            visualization: response.data.visualization,
+            image_url: response.data.image_url,
           },
           timestamp: new Date().toISOString(),
         };
@@ -143,6 +167,7 @@ function App() {
 
   return (
     <div className="app-container">
+
       <Sidebar
         sessions={sessions}
         activeSession={activeSession}
