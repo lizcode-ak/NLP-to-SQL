@@ -42,15 +42,10 @@ def health_check():
 def test_connection():
     """Test database connectivity"""
     try:
-        # For SQLite, just check if the upload folder is writable
-        test_db = "test_connection"
-        conn = db_manager.get_connection(test_db)
+        db_manager.create_database_if_not_exists(Config.MYSQL_DATABASE)
+        conn = db_manager.get_connection(Config.MYSQL_DATABASE)
         conn.close()
-        # Clean up the test file
-        test_path = os.path.join(Config.UPLOAD_FOLDER, f"{test_db}.db")
-        if os.path.exists(test_path):
-            os.remove(test_path)
-        return jsonify({'success': True, 'message': 'SQLite database system is ready'})
+        return jsonify({'success': True, 'message': 'MySQL database system is ready'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -64,8 +59,8 @@ def create_session():
     """Create a new chat session"""
     try:
         session_id = datetime.now().strftime('%Y%m%d%H%M%S%f')
-        db_name = f"chat_db_{session_id}"
-        
+        db_name = Config.MYSQL_DATABASE
+
         db_manager.create_database_if_not_exists(db_name)
         
         sessions[session_id] = {

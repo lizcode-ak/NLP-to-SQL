@@ -4,8 +4,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    # SQLite is used for zero-setup local execution
-    # Databases are stored in the UPLOAD_FOLDER as .db files
+    # MySQL Configuration
+    MYSQL_HOST = os.getenv('MYSQL_HOST', '127.0.0.1')
+    MYSQL_USER = os.getenv('MYSQL_USER', 'root')
+    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
+    MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
+    MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'chatbot_db')
     
     # Ollama Configuration
     OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://127.0.0.1:11434')
